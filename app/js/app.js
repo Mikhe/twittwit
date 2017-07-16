@@ -8,7 +8,7 @@ var twitCollection = Backbone.Collection.extend({
   localStorage: new Backbone.LocalStorage("twits"),
   
   initialize: function() {
-    this.on('all', function(e, model, collection) {
+    this.on('all', function(e, model) {
       if (e == "add") {
         this.sync("create", model);
       } else if (e == "change:text") {  
@@ -25,7 +25,6 @@ module.exports = twitCollection;
 },{"../models/twit":3,"backbone":15}],2:[function(require,module,exports){
 require("./setup.js");
 
-var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');
 var twitView = require('./views/layout');
 var twitModel = require('./models/twit');
@@ -45,7 +44,7 @@ var app = new Marionette.Application({
 });
 
 app.start();
-},{"./collections/twitCollection":1,"./models/twit":3,"./setup.js":4,"./views/layout":9,"backbone":15,"backbone.marionette":12}],3:[function(require,module,exports){
+},{"./collections/twitCollection":1,"./models/twit":3,"./setup.js":4,"./views/layout":9,"backbone.marionette":12}],3:[function(require,module,exports){
 var Backbone = require('backbone');
 
 var twit = Backbone.Model.extend({
@@ -87,7 +86,7 @@ return __p;
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
-__p+='<button id="btn-filter">search</button>\n<input type="text" name="search" id="id_search"/>\n<div class="list"></div>\n<div class="form"></div>';
+__p+='<button id="btn-filter">filter by tag</button>\n<input type="text" name="search" id="id_search" list="tag_options"/>\n<datalist id="tag_options"></datalist>\n<div class="list"></div>\n<div class="form"></div>';
 }
 return __p;
 };
@@ -104,7 +103,7 @@ __p+='\n        #'+
  } 
 __p+='\n</div>\n<div class="twit-text">'+
 ((__t=( text ))==null?'':_.escape(__t))+
-'</div>\n<button id="btn-edit">E</button>\n<button id="btn-remove">X</button>';
+'</div>\n<button id="btn-edit">edit</button>\n<button id="btn-remove">X</button>';
 }
 return __p;
 };
@@ -133,11 +132,9 @@ var FormView = Marionette.View.extend({
 module.exports = FormView;
 },{"../templates/form.html":5,"backbone.marionette":12}],9:[function(require,module,exports){
 var Marionette = require('backbone.marionette');
-var Backbone = require('backbone');
 
 var FormView = require('./form');
 var ListView = require('./list');
-var TwitModel = require('../models/twit');
 
 var Layout = Marionette.View.extend({
   el: '#app-hook',
@@ -154,14 +151,15 @@ var Layout = Marionette.View.extend({
   },
   
   ui: {
-    search: '#id_search'
+    search: '#id_search',
+    taglist: "#tag_options"
   },
   
   filter: function() {
     var tag =  (this.getUI('search').val().trim() || '').replace("#", "");
     
     if (tag) {
-      this.listView.setFilter(function (child, index, collection) {
+      this.listView.setFilter(function (child, index) {
         return child.get('tag') == tag;
       });
     } else {
@@ -173,8 +171,12 @@ var Layout = Marionette.View.extend({
   onShow: function() {
     var formView = new FormView({model: this.model});
     var listView = new ListView({collection: this.collection});
+    var ds = this.getUI('taglist');
 
     this.listView = listView;
+    _.without(_.uniq(this.collection.pluck("tag")), "").forEach(function(t){
+      ds.append($('<option>').attr("value", t));
+    });
     this.showChildView('form', formView);
     this.showChildView('list', listView);
   },
@@ -190,9 +192,8 @@ var Layout = Marionette.View.extend({
 });
 
 module.exports = Layout;
-},{"../models/twit":3,"../templates/layout.html":6,"./form":8,"./list":10,"backbone":15,"backbone.marionette":12}],10:[function(require,module,exports){
+},{"../templates/layout.html":6,"./form":8,"./list":10,"backbone.marionette":12}],10:[function(require,module,exports){
 var Marionette = require('backbone.marionette');
-var Backbone = require('backbone');
 
 var twit = Marionette.View.extend({
   tagName: 'li',
@@ -213,6 +214,7 @@ var twitList = Marionette.CollectionView.extend({
   },
   
   createModel: function(txt) {
+    //fill model attributes
     var _match = txt.match(/#(\w|\d)+/g);
     return {
       text: txt,
@@ -225,8 +227,10 @@ var twitList = Marionette.CollectionView.extend({
   },
   
   onChildviewEditTwit: function(child) {
+    //checking state
     var ta = child.$el.find("textarea");
     if (ta.length) {
+      //if after edit
       var txt = ta.val();
       if (txt) {
         child.model.set(this.createModel(txt), {validate: true});
@@ -236,6 +240,8 @@ var twitList = Marionette.CollectionView.extend({
       }
       child.render();
     } else {
+      //if before edit
+      child.$el.find("#btn-edit").text("save");
       child.$el.find(".twit-text").replaceWith($("<textarea></>").val(child.model.get("text")));
     }  
   }
@@ -243,7 +249,7 @@ var twitList = Marionette.CollectionView.extend({
 
 
 module.exports = twitList;
-},{"../templates/twit.html":7,"backbone":15,"backbone.marionette":12}],11:[function(require,module,exports){
+},{"../templates/twit.html":7,"backbone.marionette":12}],11:[function(require,module,exports){
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory(require("underscore"), require("backbone"));

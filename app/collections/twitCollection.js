@@ -7,7 +7,7 @@ var twitCollection = Backbone.Collection.extend({
   localStorage: new Backbone.LocalStorage("twits"),
   
   initialize: function() {
-    this.on('all', function(e, model, collection) {
+    this.on('all', function(e, model) {
       if (e == "add") {
         this.sync("create", model);
       } else if (e == "change:text") {  

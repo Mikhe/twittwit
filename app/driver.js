@@ -1,6 +1,5 @@
 require("./setup.js");
 
-var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');
 var twitView = require('./views/layout');
 var twitModel = require('./models/twit');

@@ -1,5 +1,4 @@
 var Marionette = require('backbone.marionette');
-var Backbone = require('backbone');
 
 var twit = Marionette.View.extend({
   tagName: 'li',
@@ -20,6 +19,7 @@ var twitList = Marionette.CollectionView.extend({
   },
   
   createModel: function(txt) {
+    //fill model attributes
     var _match = txt.match(/#(\w|\d)+/g);
     return {
       text: txt,
@@ -32,8 +32,10 @@ var twitList = Marionette.CollectionView.extend({
   },
   
   onChildviewEditTwit: function(child) {
+    //checking state
     var ta = child.$el.find("textarea");
     if (ta.length) {
+      //if after edit
       var txt = ta.val();
       if (txt) {
         child.model.set(this.createModel(txt), {validate: true});
@@ -43,6 +45,8 @@ var twitList = Marionette.CollectionView.extend({
       }
       child.render();
     } else {
+      //if before edit
+      child.$el.find("#btn-edit").text("save");
       child.$el.find(".twit-text").replaceWith($("<textarea></>").val(child.model.get("text")));
     }  
   }
