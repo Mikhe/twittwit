@@ -39,7 +39,7 @@ var twitList = Marionette.CollectionView.extend({
       var txt = ta.val();
       if (txt) {
         child.model.set(this.createModel(txt), {validate: true});
-        if (!child.model.validationError) {
+        if (!child.model.validationError && child.model.hasChanged("text")) {
           child.model.collection.set(child.model, {remove: false});
         }  
       }
