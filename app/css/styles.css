@@ -1,0 +1,29 @@
+.list ul {
+    padding-left: 55px;
+}
+.list li {
+    padding: 5px;
+    overflow: hidden;
+    min-height: 50px;
+}
+.list li > * {
+    vertical-align: top;
+}
+.list li .twit-text {
+    float: left;
+    width: 300px;
+}
+
+.list li .twit-tag {
+    width: 300px;
+    font-weight: bold;
+    min-height: 18px;
+}
+
+form > * {
+    vertical-align: top;
+}
+
+textarea {
+    width: 291px;
+}
