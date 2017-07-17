@@ -52,6 +52,17 @@ var twit = Backbone.Model.extend({
     text: '',
     tags: []
   },
+  
+  createModel: function(txt) {
+    //fill model attributes
+    var _match = txt.match(/#(\w|\d)+/g);
+    return {
+      text: txt,
+      tags: _match ? _match.map(function(m) {
+        return m.substr(1);
+      }) : []
+    }
+  },
 
   validate: function(attrs) {
       var errors = {};
@@ -97,17 +108,16 @@ module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
 __p+='<div class="twit-tags">\n    ';
- if (tags && tags.length) { 
-__p+='\n        ';
- _.map(tags, function(tag){
-            return 
-__p+='#'+
-((__t=( tag ))==null?'':_.escape(__t))+
-'\n        ';
- }).join(", "); 
-__p+='    \n    ';
- } 
-__p+='\n</div>\n<div class="twit-text">'+
+ 
+        if (tags && tags.length) { 
+            var tag =  _.map(tags, function(tag){
+                return "#" + tag;
+            }).join(", ") || "";
+        }
+    
+__p+='\n    '+
+((__t=( tag ))==null?'':__t)+
+'\n</div>\n<div class="twit-text">'+
 ((__t=( text ))==null?'':_.escape(__t))+
 '</div>\n<button id="btn-edit">edit</button>\n<button id="btn-remove">X</button>';
 }
@@ -189,7 +199,7 @@ var Layout = Marionette.View.extend({
 
   onChildviewAddTwit: function(child) {
     var txt = child.ui.text.val()||"";
-    var _model = this.listView.createModel(txt);
+    var _model = this.model.createModel(txt);
     this.model.set(_model, { validate: true });
     if (!this.model.validationError) {
         this.listView.addTwit(_model);
@@ -219,17 +229,6 @@ var twitList = Marionette.CollectionView.extend({
     child.model.collection.remove(child.model);
   },
   
-  createModel: function(txt) {
-    //fill model attributes
-    var _match = txt.match(/#(\w|\d)+/g);
-    return {
-      text: txt,
-      tags: _match ? _match.map(function(m) {
-        return m.substr(1);
-      }) : []
-    }
-  },
-  
   addTwit: function(m) {
     this.collection.add(m);
   },
@@ -241,7 +240,8 @@ var twitList = Marionette.CollectionView.extend({
       //if after edit
       var txt = ta.val();
       if (txt) {
-        child.model.set(this.createModel(txt), {validate: true});
+        //child.model.set(this.createModel(txt), {validate: true});
+        child.model.set(child.model.createModel(txt), {validate: true});
         if (!child.model.validationError && child.model.hasChanged("text")) {
           child.model.collection.set(child.model, {remove: false});
         }  

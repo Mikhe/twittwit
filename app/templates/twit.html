@@ -1,9 +1,12 @@
 <div class="twit-tags">
-    <% if (tags && tags.length) { %>
-        <% _.map(tags, function(tag){
-            return %>#<%- tag %>
-        <% }).join(", "); %>    
-    <% } %>
+    <% 
+        if (tags && tags.length) { 
+            var tag =  _.map(tags, function(tag){
+                return "#" + tag;
+            }).join(", ") || "";
+        }
+    %>
+    <%= tag %>
 </div>
 <div class="twit-text"><%- text %></div>
 <button id="btn-edit">edit</button>

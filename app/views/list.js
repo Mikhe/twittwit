@@ -18,17 +18,6 @@ var twitList = Marionette.CollectionView.extend({
     child.model.collection.remove(child.model);
   },
   
-  createModel: function(txt) {
-    //fill model attributes
-    var _match = txt.match(/#(\w|\d)+/g);
-    return {
-      text: txt,
-      tags: _match ? _match.map(function(m) {
-        return m.substr(1);
-      }) : []
-    }
-  },
-  
   addTwit: function(m) {
     this.collection.add(m);
   },
@@ -40,7 +29,8 @@ var twitList = Marionette.CollectionView.extend({
       //if after edit
       var txt = ta.val();
       if (txt) {
-        child.model.set(this.createModel(txt), {validate: true});
+        //child.model.set(this.createModel(txt), {validate: true});
+        child.model.set(child.model.createModel(txt), {validate: true});
         if (!child.model.validationError && child.model.hasChanged("text")) {
           child.model.collection.set(child.model, {remove: false});
         }  

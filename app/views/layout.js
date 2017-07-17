@@ -50,7 +50,7 @@ var Layout = Marionette.View.extend({
 
   onChildviewAddTwit: function(child) {
     var txt = child.ui.text.val()||"";
-    var _model = this.listView.createModel(txt);
+    var _model = this.model.createModel(txt);
     this.model.set(_model, { validate: true });
     if (!this.model.validationError) {
         this.listView.addTwit(_model);

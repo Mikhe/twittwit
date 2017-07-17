@@ -5,6 +5,17 @@ var twit = Backbone.Model.extend({
     text: '',
     tags: []
   },
+  
+  createModel: function(txt) {
+    //fill model attributes
+    var _match = txt.match(/#(\w|\d)+/g);
+    return {
+      text: txt,
+      tags: _match ? _match.map(function(m) {
+        return m.substr(1);
+      }) : []
+    }
+  },
 
   validate: function(attrs) {
       var errors = {};
