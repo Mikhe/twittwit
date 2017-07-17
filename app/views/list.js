@@ -23,7 +23,9 @@ var twitList = Marionette.CollectionView.extend({
     var _match = txt.match(/#(\w|\d)+/g);
     return {
       text: txt,
-      tag: _match ? _match[0].substr(1) : ''
+      tags: _match ? _match.map(function(m) {
+        return m.substr(1);
+      }) : []
     }
   },
   

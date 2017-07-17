@@ -1,6 +1,8 @@
-<div class="twit-tag">
-    <% if (tag) { %>
-        #<%- tag %>
+<div class="twit-tags">
+    <% if (tags && tags.length) { %>
+        <% _.map(tags, function(tag){
+            return %>#<%- tag %>
+        <% }).join(", "); %>    
     <% } %>
 </div>
 <div class="twit-text"><%- text %></div>

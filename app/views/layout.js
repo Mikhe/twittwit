@@ -23,11 +23,11 @@ var Layout = Marionette.View.extend({
   },
   
   filter: function() {
-    var tag =  (this.getUI('search').val().trim() || '').replace("#", "");
+    var tags =  (this.getUI('search').val().trim() || '').replace("#", "");
     
-    if (tag) {
+    if (tags) {
       this.listView.setFilter(function (child, index) {
-        return child.get('tag') == tag;
+        return _.intersection(child.get('tags'), tags).length;
       });
     } else {
       this.listView.removeFilter();
@@ -41,7 +41,7 @@ var Layout = Marionette.View.extend({
     var ds = this.getUI('taglist');
 
     this.listView = listView;
-    _.without(_.uniq(this.collection.pluck("tag")), "").forEach(function(t){
+    _.without(_.union(this.collection.pluck("tags")), "").forEach(function(t){
       ds.append($('<option>').attr("value", t));
     });
     this.showChildView('form', formView);

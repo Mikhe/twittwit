@@ -50,12 +50,13 @@ var Backbone = require('backbone');
 var twit = Backbone.Model.extend({
   defaults: {
     text: '',
-    tag: ''
+    tags: []
   },
 
   validate: function(attrs) {
       var errors = {};
       if (!attrs.text || typeof attrs.text != "string") errors.text = 'text must be set';
+      if (!attrs.tags || !_.isArray(attrs.tags)) errors.tags = 'tags must be an array';
       if (Object.keys(errors).length) return errors;
   }
 });
@@ -95,11 +96,16 @@ return __p;
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
-__p+='<div class="twit-tag">\n    ';
- if (tag) { 
-__p+='\n        #'+
+__p+='<div class="twit-tags">\n    ';
+ if (tags && tags.length) { 
+__p+='\n        ';
+ _.map(tags, function(tag){
+            return 
+__p+='#'+
 ((__t=( tag ))==null?'':_.escape(__t))+
-'\n    ';
+'\n        ';
+ }).join(", "); 
+__p+='    \n    ';
  } 
 __p+='\n</div>\n<div class="twit-text">'+
 ((__t=( text ))==null?'':_.escape(__t))+
@@ -156,11 +162,11 @@ var Layout = Marionette.View.extend({
   },
   
   filter: function() {
-    var tag =  (this.getUI('search').val().trim() || '').replace("#", "");
+    var tags =  (this.getUI('search').val().trim() || '').replace("#", "");
     
-    if (tag) {
+    if (tags) {
       this.listView.setFilter(function (child, index) {
-        return child.get('tag') == tag;
+        return _.intersection(child.get('tags'), tags).length;
       });
     } else {
       this.listView.removeFilter();
@@ -174,7 +180,7 @@ var Layout = Marionette.View.extend({
     var ds = this.getUI('taglist');
 
     this.listView = listView;
-    _.without(_.uniq(this.collection.pluck("tag")), "").forEach(function(t){
+    _.without(_.union(this.collection.pluck("tags")), "").forEach(function(t){
       ds.append($('<option>').attr("value", t));
     });
     this.showChildView('form', formView);
@@ -218,7 +224,9 @@ var twitList = Marionette.CollectionView.extend({
     var _match = txt.match(/#(\w|\d)+/g);
     return {
       text: txt,
-      tag: _match ? _match[0].substr(1) : ''
+      tags: _match ? _match.map(function(m) {
+        return m.substr(1);
+      }) : []
     }
   },
   
