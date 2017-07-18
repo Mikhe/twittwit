@@ -11,6 +11,10 @@ install modules:
 
     $ npm install
     
+build the app:
+
+    $ browserify app/driver.js -t node-underscorify -o app/js/app.js
+
 launch the app:
     
     $ node server.js
