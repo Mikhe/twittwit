@@ -41,7 +41,7 @@ var Layout = Marionette.View.extend({
     var ds = this.getUI('taglist');
 
     this.listView = listView;
-    _.without(_.union(this.collection.pluck("tags")), "").forEach(function(t){
+    _.without(_.uniq(_.flatten(this.collection.pluck("tags"))), "").forEach(function(t){
       ds.append($('<option>').attr("value", t));
     });
     this.showChildView('form', formView);
