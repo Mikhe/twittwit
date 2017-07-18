@@ -23,7 +23,7 @@ var Layout = Marionette.View.extend({
   },
   
   filter: function() {
-    var tags =  (this.getUI('search').val().trim() || '').replace("#", "");
+    var tags =  (this.getUI('search').val().trim() || '').replace("#", "").split(" ");
     
     if (tags) {
       this.listView.setFilter(function (child, index) {
